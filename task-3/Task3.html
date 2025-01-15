@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="Task3.css">
+</head>
+<body>
+  <div class="container">
+    <h1>To-Do List</h1>
+    <form id="task-form">
+      <input type="text" id="task-input" placeholder="Add a new task" required />
+      <button type="submit">Add Task</button>
+    </form>
+    <ul id="task-list"></ul>
+  </div>
+  
+  <script>
+    // app.js
+
+// Get elements
+const taskForm = document.getElementById('task-form');
+const taskInput = document.getElementById('task-input');
+const taskList = document.getElementById('task-list');
+
+// Load tasks from localStorage
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+// Display tasks on page load
+function displayTasks() {
+  taskList.innerHTML = '';
+  tasks.forEach((task, index) => {
+    const li = document.createElement('li');
+    li.classList.toggle('completed', task.completed);
+    li.innerHTML = `
+      <span class="task-text">${task.name}</span>
+      <button class="delete">Delete</button>
+    `;
+    taskList.appendChild(li);
+
+    // Mark task as completed when clicked
+    li.addEventListener('click', () => toggleTaskCompletion(index));
+
+    // Delete task when delete button is clicked
+    li.querySelector('.delete').addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent triggering task completion
+      deleteTask(index);
+    });
+  });
+}
+
+// Add a new task
+taskForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const taskName = taskInput.value.trim();
+  if (taskName) {
+    const newTask = {
+      name: taskName,
+      completed: false
+    };
+    tasks.push(newTask);
+    taskInput.value = '';
+    updateLocalStorage();
+    displayTasks();
+  }
+});
+
+// Toggle task completion
+function toggleTaskCompletion(index) {
+  tasks[index].completed = !tasks[index].completed;
+  updateLocalStorage();
+  displayTasks();
+}
+
+// Delete task
+function deleteTask(index) {
+  tasks.splice(index, 1);
+  updateLocalStorage();
+  displayTasks();
+}
+
+// Update localStorage
+function updateLocalStorage() {
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+// Display tasks initially
+displayTasks();
+
+  </script>
+</body>
+</html>
